@@ -1,0 +1,13 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+sqlalchemy[asyncio]==2.0.40
+aiomysql==0.2.0
+pymysql==1.1.1            # aiomysql 的底层依赖，不可删
+pydantic==2.11.4
+pydantic-settings==2.9.1
+python-multipart==0.0.20
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+PyJWT==2.10.1
+httpx==0.28.1
+pytest==8.3.5

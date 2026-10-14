@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XavierBlog</title>
+    <script>
+      // 首帧渲染前应用主题与语言，避免刷新时闪烁
+      ;(function () {
+        try {
+          var theme = localStorage.getItem('xb-theme')
+          if (theme !== 'light' && theme !== 'dark') {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          }
+          if (theme === 'dark') document.documentElement.classList.add('dark')
+          var locale = localStorage.getItem('xb-locale')
+          if (locale !== 'zh' && locale !== 'en') {
+            locale = (navigator.language || 'zh').toLowerCase().startsWith('zh') ? 'zh' : 'en'
+          }
+          document.documentElement.lang = locale === 'zh' ? 'zh-CN' : 'en'
+        } catch (e) {
+          /* 忽略隐私模式等 localStorage 异常 */
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
