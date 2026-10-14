@@ -25,9 +25,6 @@ class Settings(BaseSettings):
     DB_PASSWORD: str = ""
     DB_NAME: str = "xavierblog"
 
-    # 跨域
-    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:5174"
-
     @property
     def database_url(self) -> str:
         """SQLAlchemy 异步连接串。"""
@@ -35,10 +32,6 @@ class Settings(BaseSettings):
             f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?charset=utf8mb4"
         )
-
-    @property
-    def cors_origins(self) -> list[str]:
-        return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
 
 
 @lru_cache

@@ -11,6 +11,7 @@ venv/
 
 # 后端上传文件与本地库
 backend/uploads/
+backend/logs/
 *.sqlite3
 
 # Node
