@@ -1,9 +1,10 @@
-/** axios 实例：统一 baseURL、错误提示。 */
 import axios from 'axios'
 
-/** 后端服务地址：换环境（部署/内网 IP）只改这里；vite 开发代理引用同一常量。 */
-export const API_BASE = 'http://127.0.0.1:8000'
+// 开发环境
+// export const API_BASE = 'http://127.0.0.1:8000'
+export const API_BASE = 'http://1.14.167.178:8000'
 
+// 生产环境由 Nginx 反向代理到 FastAPI
 export const http = axios.create({
   baseURL: '/api/v1',
   timeout: 15000,

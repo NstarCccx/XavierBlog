@@ -5,13 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>XavierBlog</title>
+    <style>
+      /* CSS 加载前就给出暗色画布，消除刷新瞬间的白闪 */
+      html.dark {
+        background-color: #0a0c12;
+        color-scheme: dark;
+      }
+    </style>
     <script>
-      // 首帧渲染前应用主题与语言，避免刷新时闪烁
+      // 首帧渲染前应用主题与语言，避免刷新时闪烁；无保存偏好时默认暗色
       ;(function () {
         try {
           var theme = localStorage.getItem('xb-theme')
           if (theme !== 'light' && theme !== 'dark') {
-            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+            theme = 'dark'
           }
           if (theme === 'dark') document.documentElement.classList.add('dark')
           var locale = localStorage.getItem('xb-locale')

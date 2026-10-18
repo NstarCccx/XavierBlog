@@ -2,8 +2,9 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "es2023",
-    "lib": ["ES2023"],
-    "types": ["node"],
+    /* vite.config.ts 引用了 src/api/http.ts（内部使用 location / import.meta.env），需补 DOM 与 vite/client 类型 */
+    "lib": ["ES2023", "DOM"],
+    "types": ["node", "vite/client"],
     "skipLibCheck": true,
 
     /* Bundler mode */

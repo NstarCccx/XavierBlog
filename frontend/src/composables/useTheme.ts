@@ -1,4 +1,4 @@
-/** 明暗主题：localStorage 持久化，默认跟随系统。 */
+/** 明暗主题：localStorage 持久化，默认暗色。 */
 import { ref, watch } from 'vue'
 
 export type Theme = 'light' | 'dark'
@@ -7,8 +7,7 @@ const THEME_KEY = 'xb-theme'
 
 function initial(): Theme {
   const saved = localStorage.getItem(THEME_KEY)
-  if (saved === 'light' || saved === 'dark') return saved
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return saved === 'light' || saved === 'dark' ? saved : 'dark'
 }
 
 // 模块级单例：所有组件共享同一份主题状态

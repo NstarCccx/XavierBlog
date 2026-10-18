@@ -1,6 +1,6 @@
 # XavierBlog · 个人博客系统
 
-一个现代化的前后端分离个人博客系统，支持 Markdown 写作、评论管理、图片上传和完整的站点配置。
+（❤️  🩸  莱  绰  慧  🥣明   🔁  - 炒肝）一个现代化的前后端分离个人博客系统，支持 Markdown 写作、评论管理、图片上传和完整的站点配置
 
 ## 特性
 
@@ -14,6 +14,7 @@
 ## 技术栈
 
 ### 后端
+
 - **FastAPI** — 现代异步 Web 框架，自动生成 OpenAPI 文档
 - **SQLAlchemy 2.0** — 异步 ORM，类型安全的数据库操作
 - **MySQL 8.x** — 主数据库（utf8mb4 字符集）
@@ -21,6 +22,7 @@
 - **JWT** — 无状态认证
 
 ### 前台
+
 - **Vue 3** — 组合式 API + `<script setup>`
 - **TypeScript** — 类型安全
 - **Vite** — 极速开发体验
@@ -29,6 +31,7 @@
 - **markdown-it** — Markdown 渲染 + highlight.js 代码高亮
 
 ### 管理后台
+
 - **Vue 3 + TypeScript + Vite**
 - **Element Plus** — UI 组件库
 - **md-editor-v3** — Markdown 编辑器
@@ -40,7 +43,7 @@
 ```
 ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
 │  博客前台   │      │  管理后台   │      │   后端 API  │
-│  :5173      │      │  :5174      │      │   :8000     │
+│  :8082      │      │  :8083      │      │   :8000     │
 │  Vue3       │      │  Vue3       │      │  FastAPI    │
 │  Tailwind   │      │  Element+   │      │  SQLAlchemy │
 └──────┬──────┘      └──────┬──────┘      └──────┬──────┘
@@ -81,8 +84,9 @@ uvicorn app.main:app --reload --port 8000
 ```
 
 首次启动会自动：
+
 - 创建 `xavierblog` 数据库（utf8mb4）
-- 创建所有表（users、posts、categories、tags、comments、site_configs）
+- 创建所有表（users、posts、categories、tags、comments、site\_configs）
 - 写入初始数据：管理员账号 `admin / admin123`、3 篇示例文章、2 个分类、4 个标签
 
 访问 API 文档：<http://localhost:8000/docs>
@@ -92,7 +96,7 @@ uvicorn app.main:app --reload --port 8000
 ```bash
 cd frontend
 npm install
-npm run dev        # http://localhost:5173
+npm run dev        # http://localhost:8082
 ```
 
 ### 3. 启动管理后台
@@ -100,7 +104,7 @@ npm run dev        # http://localhost:5173
 ```bash
 cd admin
 npm install
-npm run dev        # http://localhost:5174
+npm run dev        # http://localhost:8083
 ```
 
 用 `admin / admin123` 登录管理后台，建议首次登录后修改密码。
@@ -142,15 +146,15 @@ XavierBlog/
 
 6 张核心表：
 
-| 表名 | 说明 | 关键字段 |
-|------|------|----------|
-| `users` | 管理员 | username, hashed_password, nickname |
-| `posts` | 文章 | title, slug, content, status, views, category_id |
-| `categories` | 分类 | name, slug, description |
-| `tags` | 标签 | name, slug |
-| `post_tags` | 文章-标签关联 | post_id, tag_id |
-| `comments` | 评论 | post_id, nickname, content, status, is_author |
-| `site_configs` | 站点配置 | key, value（单行存储） |
+| 表名             | 说明      | 关键字段                                              |
+| -------------- | ------- | ------------------------------------------------- |
+| `users`        | 管理员     | username, hashed\_password, nickname              |
+| `posts`        | 文章      | title, slug, content, status, views, category\_id |
+| `categories`   | 分类      | name, slug, description                           |
+| `tags`         | 标签      | name, slug                                        |
+| `post_tags`    | 文章-标签关联 | post\_id, tag\_id                                 |
+| `comments`     | 评论      | post\_id, nickname, content, status, is\_author   |
+| `site_configs` | 站点配置    | key, value（单行存储）                                  |
 
 所有业务表包含 `created_at`、`updated_at` 时间戳字段。
 
@@ -270,10 +274,6 @@ server {
 - `SECRET_KEY` — JWT 签名密钥（生产环境必须修改）
 - `CORS_ORIGINS` — 跨域白名单
 - `DEBUG` — 调试模式
-
-## 截图
-
-> 待补充
 
 ## 许可证
 

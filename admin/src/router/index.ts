@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
-  history: createWebHistory(),
+  // BASE_URL：dev 为 '/'，生产构建为 '/admin/'，路由自动带子路径前缀
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/login',

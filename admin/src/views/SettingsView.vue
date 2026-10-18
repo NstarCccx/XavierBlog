@@ -57,7 +57,8 @@ async function savePassword() {
     await changePassword(pwdForm.oldPassword, pwdForm.newPassword)
     ElMessage.success('密码已修改，请重新登录')
     localStorage.removeItem('admin_token')
-    location.href = '/login'
+    // BASE_URL：dev '/'，生产 '/admin/'
+    location.href = `${import.meta.env.BASE_URL}login`
   } catch (e) {
     ElMessage.error(errorMessage(e))
   } finally {
