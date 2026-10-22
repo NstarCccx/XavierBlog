@@ -48,10 +48,12 @@ _env_fill() { # $1=键 $2=提示文案 $3=默认值 $4=是否显示默认值；�
 }
 
 echo "👇 配置 deploy/.env：已填过的项自动跳过，直接回车采用方括号里的默认值"
-_env_fill REGISTRY "镜像仓库地址（REGISTRY）" "crpi-mj7u15y6i9cfm1vy.cn-guangzhou.personal.cr.aliyuncs.com/xavierblog"
+_env_fill REGISTRY "镜像仓库地址（REGISTRY）" "crpi-mj7u15y6i9cfm1vy.cn-guangzhou.personal.cr.aliyuncs.com/xavierblog2026"
 _env_fill TAG "镜像标签（TAG）" "latest"
 _env_fill HTTP_PORT "HTTP 对外端口" "80"
 _env_fill HTTPS_PORT "HTTPS 对外端口" "443"
+_env_fill DB_PUBLIC_HOST "数据库监听地址（Navicat 连接用，0.0.0.0=对外，127.0.0.1=仅本机/SSH 隧道）" "0.0.0.0"
+_env_fill DB_PUBLIC_PORT "数据库对外端口（Navicat 连接用）" "3306"
 _env_fill MYSQL_ROOT_PASSWORD "MySQL root 密码" "$(openssl rand -hex 16)" 0
 _env_fill DB_PASSWORD "应用数据库密码（DB_PASSWORD）" "$(openssl rand -hex 16)" 0
 _env_fill SECRET_KEY "JWT 签名密钥（SECRET_KEY）" "$(openssl rand -hex 32)" 0

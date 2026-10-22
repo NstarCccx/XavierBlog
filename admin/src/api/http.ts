@@ -2,9 +2,6 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
-/** 后端服务地址：换环境（部署/内网 IP）只改这里；vite 开发代理引用同一常量。 */
-// export const API_BASE = 'http://127.0.0.1:8000'
-export const API_BASE = 'http://1.14.167.178:8000'
 
 export const http = axios.create({
   baseURL: '/api/v1',
