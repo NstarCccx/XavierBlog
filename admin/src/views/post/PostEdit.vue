@@ -21,6 +21,7 @@ const form = ref<PostForm>({
   content: '',
   cover: '',
   status: 'draft',
+  is_pinned: false,
   category_id: null,
   tag_ids: [],
 })
@@ -52,6 +53,7 @@ onMounted(async () => {
         content: post.content,
         cover: post.cover,
         status: post.status,
+        is_pinned: post.is_pinned,
         category_id: post.category?.id ?? null,
         tag_ids: post.tags.map((t) => t.id),
       }
@@ -140,6 +142,9 @@ async function onUploadImg(files: File[], callback: (urls: string[]) => void) {
           <el-select v-model="form.tag_ids" multiple placeholder="选择标签" style="width: 100%" filterable>
             <el-option v-for="t in allTags" :key="t.id" :label="t.name" :value="t.id" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="置顶">
+          <el-switch v-model="form.is_pinned" active-text="置顶显示在文章列表最前" />
         </el-form-item>
         <el-form-item label="封面图">
           <el-input v-model="form.cover" placeholder="封面图 URL（可在图片库复制）" />

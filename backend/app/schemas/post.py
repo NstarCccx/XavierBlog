@@ -14,6 +14,7 @@ class PostCreate(BaseModel):
     content: str = Field(min_length=1)
     cover: str = ""
     status: str = Field("draft", pattern="^(draft|published)$")
+    is_pinned: bool = False
     category_id: int | None = None
     tag_ids: list[int] = []
 
@@ -25,6 +26,7 @@ class PostUpdate(BaseModel):
     content: str | None = Field(None, min_length=1)
     cover: str | None = None
     status: str | None = Field(None, pattern="^(draft|published)$")
+    is_pinned: bool | None = None
     category_id: int | None = None
     tag_ids: list[int] | None = None
 
@@ -41,6 +43,7 @@ class PostBrief(BaseModel):
     cover: str
     status: str
     views: int
+    is_pinned: bool = False
     published_at: datetime | None
     category: CategoryBrief | None = None
     tags: list[TagBrief] = []

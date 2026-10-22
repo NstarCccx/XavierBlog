@@ -48,7 +48,7 @@ async def list_posts(
 
     total = (await db.execute(total_stmt)).scalar_one()
     result = await db.execute(
-        base.order_by(Post.published_at.desc(), Post.id.desc())
+        base.order_by(Post.is_pinned.desc(), Post.published_at.desc(), Post.id.desc())
         .offset((page - 1) * page_size)
         .limit(page_size)
     )
@@ -105,6 +105,7 @@ async def create(
     content: str,
     cover: str,
     status: str,
+    is_pinned: bool,
     category_id: int | None,
     tag_ids: list[int],
 ) -> Post:
@@ -116,6 +117,7 @@ async def create(
         content=content,
         cover=cover,
         status=status,
+        is_pinned=is_pinned,
         category_id=category_id,
         published_at=now if status == "published" else None,
     )

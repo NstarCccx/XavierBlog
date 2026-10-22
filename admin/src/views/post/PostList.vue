@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getPosts, deletePost } from '@/api'
+import { getPosts, deletePost, updatePost } from '@/api'
 import { errorMessage } from '@/api/http'
 import PageHeader from '@/components/PageHeader.vue'
 import type { PostBrief } from '@/types'
@@ -42,6 +42,16 @@ async function handleDelete(post: PostBrief) {
   try {
     await deletePost(post.id)
     ElMessage.success('已删除')
+    await load()
+  } catch (e) {
+    ElMessage.error(errorMessage(e))
+  }
+}
+
+async function handleTogglePin(post: PostBrief) {
+  try {
+    await updatePost(post.id, { is_pinned: !post.is_pinned })
+    ElMessage.success(post.is_pinned ? '已取消置顶' : '已置顶')
     await load()
   } catch (e) {
     ElMessage.error(errorMessage(e))
@@ -95,6 +105,9 @@ onMounted(load)
             <router-link :to="`/posts/${row.id}/edit`" class="text-blue-600 hover:underline">
               {{ row.title }}
             </router-link>
+            <el-tag v-if="row.is_pinned" type="warning" size="small" effect="plain" class="ml-2">
+              置顶
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="分类" width="110">
@@ -116,9 +129,12 @@ onMounted(load)
         <el-table-column label="发布时间" width="160">
           <template #default="{ row }">{{ formatTime(row.published_at) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="140" fixed="right">
+        <el-table-column label="操作" width="190" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="router.push(`/posts/${row.id}/edit`)">编辑</el-button>
+            <el-button link :type="row.is_pinned ? 'warning' : 'primary'" @click="handleTogglePin(row)">
+              {{ row.is_pinned ? '取消置顶' : '置顶' }}
+            </el-button>
             <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>

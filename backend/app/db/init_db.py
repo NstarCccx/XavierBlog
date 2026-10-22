@@ -1,7 +1,7 @@
 """首次启动初始化：建库、建表、写入种子数据（幂等，已有数据则跳过）。"""
 import logging
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 
 from app.core.security import hash_password
 from app.crud import crud_site
@@ -18,7 +18,7 @@ WELCOME_POST = """\
 
 ### 你能做什么
 
-- 在**管理后台**（`http://localhost:5174`）用 `admin / admin123` 登录
+- 在**管理后台**（`https://guangxuan.xyz/admin/`）用 `admin / admin123` 登录
 - 写新文章、管理分类标签、审核评论、上传图片
 - 在**站点设置**里修改站名、简介和关于页
 
@@ -135,8 +135,19 @@ async def seed() -> None:
 
 
 async def init_db() -> None:
-    """建库 → 建表 → 种子。应用启动时调用。"""
+    """建库 → 建表 → 轻量迁移 → 种子。应用启动时调用。"""
     await ensure_database()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # create_all 不会给已存在的表加列，这里补齐新增字段（幂等）
+        has_pinned = (await conn.execute(text(
+            "SELECT COUNT(*) FROM information_schema.columns "
+            "WHERE table_schema = DATABASE() "
+            "AND table_name = 'posts' AND column_name = 'is_pinned'"
+        ))).scalar_one()
+        if not has_pinned:
+            await conn.execute(text(
+                "ALTER TABLE posts ADD COLUMN is_pinned BOOL NOT NULL DEFAULT 0 COMMENT '是否置顶'"
+            ))
+            logger.info("已为 posts 表补充 is_pinned 列")
     await seed()

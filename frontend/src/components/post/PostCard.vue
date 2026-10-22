@@ -23,6 +23,12 @@ const { t } = useLocale()
     </div>
 
     <div class="mb-2 flex flex-wrap items-center gap-3 font-mono text-xs text-stone-400 dark:text-stone-500">
+      <span
+        v-if="post.is_pinned"
+        class="rounded-md bg-amber-100/80 px-2 py-0.5 font-semibold text-amber-600 dark:bg-amber-500/15 dark:text-amber-400"
+      >
+        {{ t('post.pinned') }}
+      </span>
       <span>{{ formatDate(post.published_at) }}</span>
       <router-link
         v-if="post.category"

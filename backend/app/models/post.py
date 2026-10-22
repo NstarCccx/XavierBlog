@@ -1,7 +1,7 @@
 """文章表。"""
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
@@ -23,6 +23,9 @@ class Post(TimestampMixin, Base):
         comment="状态：草稿/已发布",
     )
     views: Mapped[int] = mapped_column(Integer, default=0, comment="浏览量")
+    is_pinned: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="0", comment="是否置顶"
+    )
     published_at: Mapped[datetime | None] = mapped_column(
         DateTime, server_default=func.now(), comment="发布时间"
     )
