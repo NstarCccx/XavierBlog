@@ -31,6 +31,7 @@ export interface PostBrief {
   cover: string
   status: 'draft' | 'published'
   views: number
+  is_pinned: boolean
   published_at: string | null
   category: CategoryBrief | null
   tags: TagBrief[]
@@ -71,4 +72,12 @@ export interface SiteInfo {
   site_description: string
   about_content: string
   footer: string
+  /** ICP 备案号，如「粤ICP备2026162376号」。 */
+  icp_number: string
+  /** ICP 备案查询链接。 */
+  icp_link: string
+  /** 公安备案号，如「粤公网安备 XXXXXXXXXXXXXX号」，未下发时为空串。 */
+  police_number: string
+  /** 公安备案查询链接。 */
+  police_link: string
 }

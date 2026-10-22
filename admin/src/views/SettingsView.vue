@@ -11,6 +11,10 @@ const siteForm = reactive({
   site_description: '',
   footer: '',
   about_content: '',
+  icp_number: '',
+  icp_link: '',
+  police_number: '',
+  police_link: '',
 })
 const siteSaving = ref(false)
 
@@ -91,6 +95,35 @@ onMounted(loadSite)
             type="textarea"
             :rows="8"
             placeholder="支持 Markdown"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" :loading="siteSaving" @click="saveSite">保存设置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <el-card shadow="never" class="mb-5">
+      <template #header><span class="font-semibold">备案信息</span></template>
+      <el-form :model="siteForm" label-width="110px">
+        <el-form-item label="ICP 备案号">
+          <el-input v-model="siteForm.icp_number" maxlength="50" placeholder="如：粤ICP备2026162376号" />
+        </el-form-item>
+        <el-form-item label="ICP 备案链接">
+          <el-input v-model="siteForm.icp_link" maxlength="200" placeholder="https://beian.miit.gov.cn/" />
+        </el-form-item>
+        <el-form-item label="公安备案号">
+          <el-input
+            v-model="siteForm.police_number"
+            maxlength="50"
+            placeholder="如：粤公网安备 XXXXXXXXXXXXXX号（未下发可留空，留空则前台不展示）"
+          />
+        </el-form-item>
+        <el-form-item label="公安备案链接">
+          <el-input
+            v-model="siteForm.police_link"
+            maxlength="200"
+            placeholder="https://beian.mps.gov.cn/#/query/webSearch?code=XXXXXXXXXXXXXX"
           />
         </el-form-item>
         <el-form-item>

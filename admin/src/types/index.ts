@@ -27,6 +27,7 @@ export interface PostBrief {
   cover: string
   status: 'draft' | 'published'
   views: number
+  is_pinned: boolean
   published_at: string | null
   category: CategoryBrief | null
   tags: TagBrief[]
@@ -102,6 +103,7 @@ export interface PostForm {
   content: string
   cover: string
   status: 'draft' | 'published'
+  is_pinned: boolean
   category_id: number | null
   tag_ids: number[]
 }

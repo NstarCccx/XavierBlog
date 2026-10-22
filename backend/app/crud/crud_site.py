@@ -9,6 +9,11 @@ DEFAULTS: dict[str, str] = {
     "site_description": "一个用 FastAPI + Vue3 搭建的个人博客",
     "about_content": "## 关于我\n\n这里填写关于页内容（支持 Markdown）。",
     "footer": "© 2026 XavierBlog · Powered by FastAPI + Vue3",
+    # 备案信息：ICP 已备案，公安备案号码待下发（留空时前台不展示）
+    "icp_number": "粤ICP备2026162376号",
+    "icp_link": "https://beian.miit.gov.cn/",
+    "police_number": "",
+    "police_link": "",
 }
 
 

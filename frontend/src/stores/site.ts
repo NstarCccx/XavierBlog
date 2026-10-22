@@ -10,6 +10,10 @@ export const useSiteStore = defineStore('site', () => {
     site_description: '',
     about_content: '',
     footer: '',
+    icp_number: '粤ICP备2026162376号',
+    icp_link: 'https://beian.miit.gov.cn/',
+    police_number: '',
+    police_link: '',
   })
 
   async function load() {
