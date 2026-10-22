@@ -17,6 +17,49 @@ const { theme } = useTheme()
 const sectionEl = ref<HTMLElement | null>(null)
 const canvasEl = ref<HTMLCanvasElement | null>(null)
 
+/** 项目仓库地址 */
+const REPO_URL = 'https://github.com/NstarCccx/XavierBlog'
+
+/** 复制状态：copied 短暂展示成功提示，failed 展示失败提示 */
+type CopyState = 'idle' | 'copied' | 'failed'
+const copyState = ref<CopyState>('idle')
+let copyTimer: number | undefined
+
+async function copyRepoUrl() {
+  const ok = await writeClipboard(REPO_URL)
+  copyState.value = ok ? 'copied' : 'failed'
+  window.clearTimeout(copyTimer)
+  copyTimer = window.setTimeout(() => {
+    copyState.value = 'idle'
+  }, 2000)
+}
+
+/** 优先用 Clipboard API，非安全上下文（如 http 部署）回退到 execCommand */
+async function writeClipboard(text: string): Promise<boolean> {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text)
+      return true
+    } catch {
+      // 继续尝试回退方案
+    }
+  }
+  try {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.setAttribute('readonly', '')
+    ta.style.position = 'fixed'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    const ok = document.execCommand('copy')
+    document.body.removeChild(ta)
+    return ok
+  } catch {
+    return false
+  }
+}
+
 const letters = computed(() => Array.from((site.info.site_name || 'XavierBlog').trim().slice(0, 12)))
 
 /** 归一化指针位置（0~1），供 DOM 视差、光晕与 HUD 读数使用 */
@@ -373,6 +416,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   cancelAnimationFrame(rafId)
   resizeObserver?.disconnect()
+  window.clearTimeout(copyTimer)
 })
 </script>
 
@@ -406,9 +450,69 @@ onBeforeUnmount(() => {
 
     <!-- 主内容 -->
     <div class="relative z-10 flex flex-1 flex-col items-center justify-center px-6 text-center">
-      <p class="mb-8 font-mono text-[11px] tracking-[0.35em] text-indigo-500/80 uppercase sm:text-xs dark:text-cyan-300/80">
+      <p class="mb-3 font-mono text-[11px] tracking-[0.35em] text-indigo-500/80 uppercase sm:text-xs dark:text-cyan-300/80">
         {{ t('hero.badge') }}
       </p>
+
+      <!-- 项目仓库地址：点击右侧按钮复制 -->
+      <div class="mb-8 flex flex-wrap items-center justify-center gap-2 text-xs">
+        <span class="text-stone-500 dark:text-stone-400">{{ t('hero.repo') }}</span>
+        <code
+          class="select-text rounded-md border border-stone-900/10 bg-white/50 px-2 py-1 font-mono text-[11px] text-stone-600 sm:text-xs dark:border-white/15 dark:bg-white/5 dark:text-stone-300"
+        >
+          {{ REPO_URL }}
+        </code>
+        <button
+          type="button"
+          class="inline-flex items-center gap-1 rounded-md border border-stone-900/10 bg-white/50 px-2 py-1 font-mono text-[11px] text-stone-500 transition-colors hover:border-indigo-300 hover:text-indigo-600 sm:text-xs dark:border-white/15 dark:bg-white/5 dark:text-stone-400 dark:hover:border-amber-300/50 dark:hover:text-amber-300"
+          :aria-label="t('hero.copy')"
+          @click.stop="copyRepoUrl"
+        >
+          <svg
+            v-if="copyState === 'idle'"
+            class="h-3.5 w-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          <svg
+            v-else-if="copyState === 'copied'"
+            class="h-3.5 w-3.5 text-emerald-500"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          <svg
+            v-else
+            class="h-3.5 w-3.5 text-rose-500"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M15 9l-6 6M9 9l6 6" />
+          </svg>
+          <span
+            :class="copyState === 'copied' ? 'text-emerald-500' : copyState === 'failed' ? 'text-rose-500' : ''"
+          >
+            {{ copyState === 'copied' ? t('hero.copied') : copyState === 'failed' ? t('hero.copyFailed') : t('hero.copy') }}
+          </span>
+        </button>
+      </div>
 
       <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
         <div v-for="(ch, i) in letters" :key="i" :style="letterStyle(i)">

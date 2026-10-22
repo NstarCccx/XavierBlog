@@ -20,14 +20,19 @@ const messages: Record<Locale, Record<string, string>> = {
     'hero.badge': '全栈 · 技术笔记 · 一直学习 · 一直构建',
     'hero.subtitle': '记录日常、开发代码与问题思考',
     'hero.start': '点击滚动阅读',
-    'hero.about': '了解我 · GuangXuan·Chen',
+    'hero.about': 'About - Xavie Chan',
     'hero.scroll': '向下滑动探索',
+    'hero.repo': '源码地址：',
+    'hero.copy': '复制',
+    'hero.copied': '已复制',
+    'hero.copyFailed': '复制失败',
 
     'common.loading': '加载中…',
     'home.latest': '最新文章',
     'home.noPosts': '还没有文章',
 
     'post.views': '{n} 次阅读',
+    'post.pinned': '置顶',
 
     'page.prev': '上一页',
     'page.next': '下一页',
@@ -80,12 +85,17 @@ const messages: Record<Locale, Record<string, string>> = {
     'hero.start': 'Start Reading',
     'hero.about': 'About Me',
     'hero.scroll': 'SCROLL TO EXPLORE',
+    'hero.repo': 'Project repository:',
+    'hero.copy': 'Copy',
+    'hero.copied': 'Copied',
+    'hero.copyFailed': 'Copy failed',
 
     'common.loading': 'Loading…',
     'home.latest': 'Latest Posts',
     'home.noPosts': 'No posts yet',
 
     'post.views': '{n} views',
+    'post.pinned': 'Pinned',
 
     'page.prev': 'Prev',
     'page.next': 'Next',
