@@ -1,6 +1,6 @@
 # XavierBlog · 个人博客系统
 
-（❤️  🩸  莱  绰  慧  🥣明   🔁 - 炒肝）一个现代化的前后端分离个人博客系统，支持 Markdown 写作、评论管理、图片上传和完整的站点配置
+（❤️  🩸  莱  绰  慧  🥣明   🔁 - 炒肝）一个现代化的前后端分离个人博客系统，支持 Markdown 写作、用户注册与登录评论、图片上传和完整的站点配置
 
 | <br /> | <br />                                    |
 | ------ | ----------------------------------------- |
@@ -10,11 +10,12 @@
 ## 特性
 
 - **Markdown 写作** — 支持代码高亮、目录提取、封面图，草稿/发布状态管理、文章置顶
+- **用户账号** — 前台注册/登录（用户名 + 昵称 + 密码），仅登录用户可评论；管理员与注册用户同表异角色（`role`），权限互不越界
 - **分类与标签** — 文章多对多归类，灵活的分类体系
-- **评论系统** — 游客留言（默认待审核）、博主回复、后台审核管理
+- **评论系统** — 登录用户评论即时展示、博主回复自动带徽章、后台审核管理
 - **管理后台** — 仪表盘统计、文章/分类/标签/评论管理、图片库、站点设置
-- **前台展示** — 首页列表、文章详情（代码高亮 + 侧边目录）、分类/标签浏览、时间线归档、关于页
-- **自动初始化** — 首次启动自动建库建表、写入种子数据，无需手动配置数据库
+- **前台展示** — 首页列表、文章详情（代码高亮 + 侧边目录）、分类/标签浏览、时间线归档、关于页；中英文双语界面
+- **自动初始化** — 首次启动自动建库建表、写入种子数据；版本升级新增字段时启动自动补列补外键，无需手工迁移数据库
 - **站点备案信息** — ICP 备案号链接工信部查询，公安备案号带图标展示，均可在后台编辑
 - **容器化部署** — 5 个容器（nginx 网关 + 前后台 + FastAPI + MySQL），一条命令上线，自动续签 HTTPS 证书
 
@@ -26,7 +27,7 @@
 - **SQLAlchemy 2.0** — 异步 ORM，类型安全的数据库操作
 - **MySQL 8.x** — 主数据库（utf8mb4 字符集）
 - **Pydantic** — 请求/响应数据校验
-- **JWT** — 无状态认证
+- **JWT** — 无状态认证，前台用户与后台管理员共用签发体系，按 `role` 隔离权限
 
 ### 前台
 
@@ -137,6 +138,8 @@ npm install
 npm run dev        # http://localhost:8082
 ```
 
+前台账号在页面顶栏「登录 / 注册」创建（用户名 + 昵称 + 密码），登录后才能发表评论。
+
 ### 3. 启动管理后台
 
 ```bash
@@ -166,10 +169,10 @@ XavierBlog/
 │
 ├── frontend/            # 博客前台
 │   └── src/
-│       ├── api/         # 接口封装
-│       ├── components/  # 组件（layout、post、comment、common）
+│       ├── api/         # 接口封装（含 token 存取与自动携带）
+│       ├── components/  # 组件（layout、post、comment、auth、common）
 │       ├── views/       # 页面（首页、详情、归档、关于等）
-│       ├── stores/      # Pinia 状态
+│       ├── stores/      # Pinia 状态（站点配置、登录态）
 │       └── types/       # TypeScript 类型
 │
 ├── admin/               # 管理后台
@@ -195,19 +198,25 @@ XavierBlog/
 
 | 表名             | 说明      | 关键字段                                                          |
 | -------------- | ------- | ------------------------------------------------------------- |
-| `users`        | 管理员     | username, hashed\_password, nickname                          |
+| `users`        | 用户      | username, hashed\_password, nickname, role（admin 管理员 / member 注册用户） |
 | `posts`        | 文章      | title, slug, content, status, views, is\_pinned, category\_id |
 | `categories`   | 分类      | name, slug, description                                       |
 | `tags`         | 标签      | name, slug                                                    |
 | `post_tags`    | 文章-标签关联 | post\_id, tag\_id                                             |
-| `comments`     | 评论      | post\_id, nickname, content, status, is\_author               |
+| `comments`     | 评论      | post\_id, user\_id, nickname（快照）, content, status, is\_author |
 | `site_configs` | 站点配置    | key, value（键值表，每行一项配置）                                        |
 
 `users`、`posts`、`categories`、`tags`、`comments` 含 `created_at`、`updated_at` 时间戳字段；`site_configs` 为纯键值表，无时间戳。
 
+三点设计说明：
+
+- **账号与权限**：`users` 单表双角色，`role=admin` 是博主（可登录管理后台），`role=member` 是前台注册用户（只能评论）；两边登录接口都会校验角色，普通用户拿不到后台 Token。
+- **评论快照**：评论发表时把昵称固化进 `comments.nickname`，账号关联 `user_id` 在外键上 `ON DELETE SET NULL`——注销账号不影响历史评论展示。
+- **免手工迁移**：`init_db()` 启动时用 `information_schema` 判断并幂等 `ALTER TABLE` 补新列/外键，老库拉到新镜像直接升级。
+
 ## API 概览
 
-### 公开接口（无需认证）
+### 公开接口（无需登录）
 
 - `GET /api/v1/posts` — 已发布文章分页
 - `GET /api/v1/posts/{slug}` — 文章详情（浏览量 +1）
@@ -215,13 +224,19 @@ XavierBlog/
 - `GET /api/v1/categories` — 分类列表
 - `GET /api/v1/tags` — 标签列表
 - `GET /api/v1/site-info` — 站点信息（含备案号）
-- `GET /api/v1/posts/{id}/comments` — 已审核评论（树形）
-- `POST /api/v1/comments` — 提交评论（默认待审核）
+- `GET /api/v1/posts/{id}/comments` — 已通过审核的评论（树形）
+- `POST /api/v1/auth/register` — 注册用户，成功直接返回 Token
+- `POST /api/v1/auth/login` — 前台登录，返回 Token
 - `GET /api/v1/health` — 健康检查
 
-### 管理接口（Bearer Token）
+### 前台接口（需 Bearer Token）
 
-- `POST /api/v1/admin/auth/login` — 登录获取 Token
+- `GET /api/v1/auth/me` — 当前登录用户
+- `POST /api/v1/comments` — 发表评论（昵称取账号快照，博主账号自动带徽章，即时展示）
+
+### 管理接口（需管理员 Token，普通用户 403）
+
+- `POST /api/v1/admin/auth/login` — 管理端登录（仅 `role=admin`）
 - `GET /api/v1/admin/auth/me` — 当前管理员信息
 - `PUT /api/v1/admin/auth/password` — 修改密码
 - `GET/POST /api/v1/admin/posts` — 文章管理（含草稿、置顶）
@@ -252,7 +267,7 @@ XavierBlog/
 | nginx    | `nginx:1.27-alpine`   | 统一入口（80/443）：`/` 博客、`/admin/` 管理台、`/api` `/uploads` 后端 |
 | frontend | `xavierblog-frontend` | 博客前台静态文件（nginx 托管）                                     |
 | admin    | `xavierblog-admin`    | 管理后台静态文件（nginx 托管，`/admin/` 子路径）                       |
-| backend  | `xavierblog-backend`  | FastAPI（uvicorn），启动自动建库建表 + 种子数据                       |
+| backend  | `xavierblog-backend`  | FastAPI（uvicorn），启动自动建库建表 + 种子数据 + 新字段迁移          |
 | mysql    | `mysql:8.4`           | 数据库，数据卷 `mysql-data` 持久化                               |
 
 数据卷：`mysql-data`（数据库）、`uploads`（上传图片）、`backend-logs`（后端日志）。
@@ -268,7 +283,7 @@ systemctl enable --now docker
 - 云安全组放行 80 / 443 端口
 - DNS 解析：`guangxuan.xyz` 与 `www.guangxuan.xyz` 的 A 记录指向服务器公网 IP
 
-### 2. 上传部署文件并启动
+### 2. 上传部署文件并启动（仅首次）
 
 ```bash
 # 把 deploy/ 目录传到服务器
@@ -279,6 +294,10 @@ cd ~/xavierblog/deploy && ./server-setup.sh
 ```
 
 首次运行会提示输入镜像仓库账号密码（阿里云 ACR 控制台「访问凭证」）；数据库密码留空则自动随机生成。
+
+> 传目录只在首次部署做一次。之后代码都走镜像，**不要再 `scp -r deploy/` 覆盖服务器**——
+> 那会用仓库里的 HTTP 版 `nginx/gateway.conf` 盖掉已切换的 SSL 配置（443 监听直接消失），
+> 也可能重置服务器上的 `.env` 数据库密码。
 
 ### 3. 启用 HTTPS
 
@@ -292,14 +311,17 @@ cd ~/xavierblog/deploy
 ### 4. 日常更新
 
 ```bash
-# 本地：改完代码重新构建推送
+# 本地：改完代码重新构建推送（自动拉起 colima，构建 linux/amd64 三镜像并推 ACR）
 cd deploy && ./build-push.sh
 
-# 服务器：
+# 服务器：只跑这两条，不需要重传代码
 cd ~/xavierblog/deploy && docker compose pull && docker compose up -d
 ```
 
-数据库卷与上传文件卷不受影响。
+`up -d` 只重建镜像变了的容器，数据库卷、上传文件卷与 `.env` 均不受影响；后端容器启动时会自动补齐本版本新增的数据库列/外键。
+
+服务器上同样**不要 `git pull` 整个仓库来更新**：`nginx/gateway.conf` 是被版本管理的文件，
+`enable-https.sh` 已在服务器上把它改成了 SSL 版，pull 会冲突或打回 HTTP 模式。
 
 ### 数据库远程连接（Navicat）
 
