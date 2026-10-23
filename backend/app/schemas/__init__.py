@@ -1,11 +1,13 @@
 """DTO 汇总导出。"""
 from app.schemas.auth import (
     AdminInfo,
+    AdminResetPasswordRequest,
     AuthResponse,
     ChangePasswordRequest,
     LoginRequest,
     RegisterRequest,
     TokenResponse,
+    UserAdminOut,
     UserInfo,
 )
 from app.schemas.category import CategoryBrief, CategoryCreate, CategoryOut, CategoryUpdate
@@ -17,11 +19,13 @@ from app.schemas.tag import TagBrief, TagCreate, TagOut, TagUpdate
 
 __all__ = [
     "AdminInfo",
+    "AdminResetPasswordRequest",
     "AuthResponse",
     "ChangePasswordRequest",
     "LoginRequest",
     "RegisterRequest",
     "TokenResponse",
+    "UserAdminOut",
     "UserInfo",
     "CategoryBrief",
     "CategoryCreate",

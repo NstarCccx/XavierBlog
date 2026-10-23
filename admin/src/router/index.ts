@@ -22,6 +22,7 @@ const router = createRouter({
         { path: 'categories', name: 'categories', component: () => import('@/views/CategoryManage.vue') },
         { path: 'tags', name: 'tags', component: () => import('@/views/TagManage.vue') },
         { path: 'comments', name: 'comments', component: () => import('@/views/CommentManage.vue') },
+        { path: 'users', name: 'users', component: () => import('@/views/UserManage.vue') },
         { path: 'uploads', name: 'uploads', component: () => import('@/views/UploadManage.vue') },
         { path: 'settings', name: 'settings', component: () => import('@/views/SettingsView.vue') },
       ],

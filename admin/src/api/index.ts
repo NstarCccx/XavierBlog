@@ -9,6 +9,7 @@ import type {
   Post,
   PostBrief,
   Tag,
+  UserAdmin,
 } from '@/types'
 
 // ---------- 认证 ----------
@@ -124,6 +125,20 @@ export async function deleteComment(id: number): Promise<void> {
 
 export async function replyComment(id: number, content: string): Promise<void> {
   await http.post(`/admin/comments/${id}/reply`, { content })
+}
+
+// ---------- 用户 ----------
+export async function getUsers(params: {
+  page?: number
+  page_size?: number
+  keyword?: string
+}): Promise<PageResult<UserAdmin>> {
+  const { data } = await http.get('/admin/users', { params })
+  return data
+}
+
+export async function resetUserPassword(id: number, newPassword: string): Promise<void> {
+  await http.put(`/admin/users/${id}/password`, { new_password: newPassword })
 }
 
 // ---------- 仪表盘 / 设置 ----------

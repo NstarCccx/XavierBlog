@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   Document, ChatDotRound, Picture, Setting, PriceTag,
-  Collection, DataBoard, SwitchButton, Fold, Expand, Monitor,
+  Collection, DataBoard, SwitchButton, Fold, Expand, Monitor, User,
 } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -17,6 +17,7 @@ const menus = [
   { index: '/categories', label: '分类管理', icon: Collection },
   { index: '/tags', label: '标签管理', icon: PriceTag },
   { index: '/comments', label: '评论管理', icon: ChatDotRound },
+  { index: '/users', label: '用户管理', icon: User },
   { index: '/uploads', label: '图片库', icon: Picture },
   { index: '/settings', label: '站点设置', icon: Setting },
 ]

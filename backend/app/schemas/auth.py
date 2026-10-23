@@ -1,4 +1,6 @@
 """认证 DTO。"""
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 
@@ -52,3 +54,21 @@ class AdminInfo(BaseModel):
     avatar: str
 
     model_config = {"from_attributes": True}
+
+
+class UserAdminOut(BaseModel):
+    """管理端用户列表项。"""
+
+    id: int
+    username: str
+    nickname: str
+    role: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class AdminResetPasswordRequest(BaseModel):
+    """管理员重置用户密码：直接下发新密码，无需原密码。"""
+
+    new_password: str = Field(min_length=6, max_length=128)

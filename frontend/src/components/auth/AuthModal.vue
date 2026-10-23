@@ -11,6 +11,8 @@ const mode = ref<Mode>('login')
 const submitting = ref(false)
 const message = ref('')
 const ok = ref(false)
+/** 忘记密码：联系管理员提示层，叠在登录弹窗之上 */
+const forgotOpen = ref(false)
 const form = reactive({ username: '', nickname: '', password: '', confirm: '' })
 
 const isLogin = computed(() => mode.value === 'login')
@@ -33,6 +35,7 @@ watch(
       submitting.value = false
       message.value = ''
       ok.value = false
+      forgotOpen.value = false
       form.username = ''
       form.nickname = ''
       form.password = ''
@@ -159,6 +162,14 @@ function onKeydown(e: KeyboardEvent) {
               :autocomplete="isLogin ? 'current-password' : 'new-password'"
               :class="field"
             />
+            <button
+              v-if="isLogin"
+              type="button"
+              class="-mt-2 ml-auto block pr-1 text-xs text-stone-400 transition-colors hover:text-indigo-500 dark:text-stone-500 dark:hover:text-indigo-400"
+              @click="forgotOpen = true"
+            >
+              {{ t('auth.forgotPassword') }}
+            </button>
             <template v-if="!isLogin">
               <input
                 v-model="form.confirm"
@@ -190,6 +201,39 @@ function onKeydown(e: KeyboardEvent) {
               {{ switchText }}
             </button>
           </form>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- 忘记密码：联系管理员提示层，叠在登录弹窗之上 -->
+    <Transition name="auth-modal">
+      <div v-if="forgotOpen" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-stone-950/50 backdrop-blur-sm" @click="forgotOpen = false" />
+
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          class="glass-card relative w-full max-w-xs overflow-hidden rounded-2xl p-6 text-center shadow-2xl"
+        >
+          <span
+            class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-400"
+            aria-hidden="true"
+          />
+
+          <h2 class="font-mono text-lg font-bold tracking-tight text-stone-900 dark:text-stone-100">
+            {{ t('auth.forgotTitle') }}
+          </h2>
+          <p class="mt-3 text-left text-sm leading-6 text-stone-500 dark:text-stone-400">
+            {{ t('auth.forgotDesc') }}
+          </p>
+
+          <button
+            type="button"
+            class="mt-5 w-full rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 active:translate-y-0"
+            @click="forgotOpen = false"
+          >
+            {{ t('auth.forgotOk') }}
+          </button>
         </div>
       </div>
     </Transition>

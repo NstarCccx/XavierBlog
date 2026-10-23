@@ -88,6 +88,14 @@ export interface AdminInfo {
   avatar: string
 }
 
+export interface UserAdmin {
+  id: number
+  username: string
+  nickname: string
+  role: 'admin' | 'member'
+  created_at: string
+}
+
 export interface UploadItem {
   filename: string
   url: string

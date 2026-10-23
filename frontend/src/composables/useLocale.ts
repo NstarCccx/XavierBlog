@@ -88,6 +88,10 @@ const messages: Record<Locale, Record<string, string>> = {
     'auth.usernameRule': '用户名 3-20 位，仅限字母、数字、下划线',
     'auth.passwordShort': '密码至少 6 位',
     'auth.passwordMismatch': '两次输入的密码不一致',
+    'auth.forgotPassword': '忘记密码？',
+    'auth.forgotTitle': '联系管理员',
+    'auth.forgotDesc': '本站暂不支持自助找回密码。请联系管理员（站长）为你重置密码，拿到新密码后登录即可。',
+    'auth.forgotOk': '我知道了',
     'auth.logout': '退出登录',
 
     'nf.desc': '页面不存在或已被移除',
@@ -169,6 +173,10 @@ const messages: Record<Locale, Record<string, string>> = {
     'auth.usernameRule': '3-20 chars: letters, digits and underscore only',
     'auth.passwordShort': 'Password must be at least 6 characters',
     'auth.passwordMismatch': 'Passwords do not match',
+    'auth.forgotPassword': 'Forgot password?',
+    'auth.forgotTitle': 'Contact the Administrator',
+    'auth.forgotDesc': 'Self-service password recovery is not available. Please contact the site administrator to reset your password, then sign in with the new one.',
+    'auth.forgotOk': 'Got it',
     'auth.logout': 'Sign out',
 
     'nf.desc': 'This page does not exist or has been removed.',
