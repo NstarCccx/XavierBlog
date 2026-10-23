@@ -75,6 +75,7 @@ async def seed() -> None:
             hashed_password=hash_password("admin123"),
             nickname="Xavier",
             avatar="",
+            role="admin",
         ))
 
         db.add_all([
@@ -134,20 +135,52 @@ async def seed() -> None:
         logger.info("种子数据写入完成：管理员 admin/admin123，3 篇示例文章")
 
 
+async def _ensure_column(conn, table: str, column: str, ddl: str) -> None:
+    """幂等加列：create_all 不会给已存在的表补新列。"""
+    exists = (await conn.execute(text(
+        "SELECT COUNT(*) FROM information_schema.columns "
+        "WHERE table_schema = DATABASE() "
+        f"AND table_name = '{table}' AND column_name = '{column}'"
+    ))).scalar_one()
+    if not exists:
+        await conn.execute(text(ddl))
+        logger.info("已为 %s 表补充 %s 列", table, column)
+
+
+async def _ensure_fk(conn, table: str, fk_name: str, ddl: str) -> None:
+    """幂等加外键约束。"""
+    exists = (await conn.execute(text(
+        "SELECT COUNT(*) FROM information_schema.table_constraints "
+        "WHERE table_schema = DATABASE() AND table_name = :t "
+        "AND constraint_name = :n AND constraint_type = 'FOREIGN KEY'"
+    ), {"t": table, "n": fk_name})).scalar_one()
+    if not exists:
+        await conn.execute(text(ddl))
+        logger.info("已为 %s 表补充外键 %s", table, fk_name)
+
+
 async def init_db() -> None:
     """建库 → 建表 → 轻量迁移 → 种子。应用启动时调用。"""
     await ensure_database()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        # create_all 不会给已存在的表加列，这里补齐新增字段（幂等）
-        has_pinned = (await conn.execute(text(
-            "SELECT COUNT(*) FROM information_schema.columns "
-            "WHERE table_schema = DATABASE() "
-            "AND table_name = 'posts' AND column_name = 'is_pinned'"
-        ))).scalar_one()
-        if not has_pinned:
-            await conn.execute(text(
-                "ALTER TABLE posts ADD COLUMN is_pinned BOOL NOT NULL DEFAULT 0 COMMENT '是否置顶'"
-            ))
-            logger.info("已为 posts 表补充 is_pinned 列")
+        # create_all 不会给已存在的表加列/外键，这里补齐（幂等）
+        await _ensure_column(
+            conn, "posts", "is_pinned",
+            "ALTER TABLE posts ADD COLUMN is_pinned BOOL NOT NULL DEFAULT 0 COMMENT '是否置顶'",
+        )
+        await _ensure_column(
+            conn, "users", "role",
+            "ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'admin' "
+            "COMMENT '角色：admin 管理员 / member 注册用户'",
+        )
+        await _ensure_column(
+            conn, "comments", "user_id",
+            "ALTER TABLE comments ADD COLUMN user_id INT NULL COMMENT '评论者账号（注销后留空）'",
+        )
+        await _ensure_fk(
+            conn, "comments", "fk_comments_user_id",
+            "ALTER TABLE comments ADD CONSTRAINT fk_comments_user_id "
+            "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL",
+        )
     await seed()

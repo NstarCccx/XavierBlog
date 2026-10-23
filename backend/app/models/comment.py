@@ -15,7 +15,10 @@ class Comment(TimestampMixin, Base):
     parent_id: Mapped[int | None] = mapped_column(
         ForeignKey("comments.id", ondelete="CASCADE"), comment="父评论（回复）"
     )
-    nickname: Mapped[str] = mapped_column(String(50), comment="评论者昵称")
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), comment="评论者账号（注销后留空）"
+    )
+    nickname: Mapped[str] = mapped_column(String(50), comment="评论者昵称快照")
     email: Mapped[str] = mapped_column(String(100), default="", comment="评论者邮箱")
     content: Mapped[str] = mapped_column(Text, comment="评论内容")
     status: Mapped[str] = mapped_column(

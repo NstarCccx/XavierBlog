@@ -67,6 +67,21 @@ export interface Comment {
   replies: Comment[]
 }
 
+export interface User {
+  id: number
+  username: string
+  nickname: string
+  avatar: string
+  /** admin 为博主，member 为前台注册用户 */
+  role: 'admin' | 'member'
+}
+
+export interface AuthResponse {
+  access_token: string
+  token_type: string
+  user: User
+}
+
 export interface SiteInfo {
   site_name: string
   site_description: string

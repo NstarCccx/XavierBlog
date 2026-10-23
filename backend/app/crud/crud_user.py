@@ -15,6 +15,26 @@ async def get_by_id(db: AsyncSession, user_id: int) -> User | None:
     return await db.get(User, user_id)
 
 
+async def create(
+    db: AsyncSession,
+    *,
+    username: str,
+    hashed_password: str,
+    nickname: str,
+    role: str = "member",
+) -> User:
+    user = User(
+        username=username,
+        hashed_password=hashed_password,
+        nickname=nickname,
+        role=role,
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
 async def update_password(db: AsyncSession, user: User, new_password: str) -> User:
     user.hashed_password = hash_password(new_password)
     await db.commit()

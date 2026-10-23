@@ -17,6 +17,8 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
     user = await crud_user.get_by_username(db, payload.username)
     if user is None or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="用户名或密码错误")
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="该账号不是管理员，无法登录管理后台")
     return TokenResponse(access_token=create_access_token(user.username))
 
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { createComment, getPostComments } from '@/api/blog'
+import { useAuthStore } from '@/stores/auth'
 import { useLocale } from '@/composables/useLocale'
 import type { Comment } from '@/types'
 import CommentItem from './CommentItem.vue'
@@ -8,13 +9,18 @@ import CommentItem from './CommentItem.vue'
 const props = defineProps<{ postId: number }>()
 
 const { t } = useLocale()
+const auth = useAuthStore()
 
 const comments = ref<Comment[]>([])
 const submitting = ref(false)
 const message = ref('')
 const ok = ref(false)
-const form = ref({ nickname: '', email: '', content: '' })
+const content = ref('')
 const replyTo = ref<Comment | null>(null)
+
+const userInitial = computed(
+  () => (auth.user?.nickname || auth.user?.username || '?').trim().charAt(0).toUpperCase(),
+)
 
 /** 评论总数（含楼中楼回复） */
 const total = computed(() => {
@@ -32,12 +38,7 @@ async function load() {
 }
 
 async function submit() {
-  if (!form.value.nickname.trim()) {
-    message.value = t('comment.needNickname')
-    ok.value = false
-    return
-  }
-  if (!form.value.content.trim()) {
+  if (!content.value.trim()) {
     message.value = t('comment.needContent')
     ok.value = false
     return
@@ -48,11 +49,9 @@ async function submit() {
     await createComment({
       post_id: props.postId,
       parent_id: replyTo.value?.id ?? null,
-      nickname: form.value.nickname.trim(),
-      email: form.value.email.trim(),
-      content: form.value.content.trim(),
+      content: content.value.trim(),
     })
-    form.value.content = ''
+    content.value = ''
     replyTo.value = null
     message.value = t('comment.ok')
     ok.value = true
@@ -81,8 +80,29 @@ load()
       />
     </h2>
 
-    <!-- 输入区 -->
-    <form class="glass-card relative mb-8 overflow-hidden p-5 sm:p-6" @submit.prevent="submit">
+    <!-- 未登录：提示登录 -->
+    <div
+      v-if="!auth.user"
+      class="glass-card relative mb-8 flex flex-wrap items-center justify-between gap-3 overflow-hidden p-5 sm:p-6"
+    >
+      <span
+        class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-400 opacity-70"
+        aria-hidden="true"
+      />
+      <p class="text-sm text-stone-500 dark:text-stone-400">
+        {{ t('comment.loginPrompt') }}
+      </p>
+      <button
+        type="button"
+        class="rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-2 text-sm text-white shadow-md shadow-indigo-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 active:translate-y-0"
+        @click="auth.openModal()"
+      >
+        {{ t('comment.loginBtn') }}
+      </button>
+    </div>
+
+    <!-- 已登录：输入区 -->
+    <form v-else class="glass-card relative mb-8 overflow-hidden p-5 sm:p-6" @submit.prevent="submit">
       <span
         class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-400 opacity-70"
         aria-hidden="true"
@@ -105,19 +125,24 @@ load()
         </button>
       </p>
 
-      <div class="mb-3 flex flex-col gap-3 sm:flex-row">
-        <input v-model="form.nickname" :placeholder="t('comment.nickname')" maxlength="50" :class="field" class="sm:max-w-[240px]" />
-        <input v-model="form.email" type="email" :placeholder="t('comment.email')" maxlength="100" :class="field" />
-      </div>
+      <p class="mb-3 flex items-center gap-2 text-xs text-stone-400 dark:text-stone-500">
+        <span
+          class="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 text-[10px] font-bold text-white"
+          aria-hidden="true"
+        >
+          {{ userInitial }}
+        </span>
+        {{ t('comment.welcome', { name: auth.user?.nickname }) }}
+      </p>
 
-      <textarea v-model="form.content" rows="4" :placeholder="t('comment.content')" maxlength="2000" :class="field" class="mb-3 resize-y" />
+      <textarea v-model="content" rows="4" :placeholder="t('comment.content')" maxlength="2000" :class="field" class="mb-3 resize-y" />
 
       <div class="flex flex-wrap items-center justify-between gap-3">
         <p class="text-xs" :class="ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'">
           {{ message }}
         </p>
         <div class="flex items-center gap-4">
-          <span class="font-mono text-xs text-stone-300 dark:text-stone-600">{{ form.content.length }} / 2000</span>
+          <span class="font-mono text-xs text-stone-300 dark:text-stone-600">{{ content.length }} / 2000</span>
           <button
             type="submit"
             :disabled="submitting"

@@ -5,12 +5,10 @@ from pydantic import BaseModel, Field
 
 
 class CommentCreate(BaseModel):
-    """游客发表评论。"""
+    """登录用户发表评论：昵称等身份信息由服务端取自当前账号。"""
 
     post_id: int
     parent_id: int | None = None
-    nickname: str = Field(min_length=1, max_length=50)
-    email: str = Field("", max_length=100)
     content: str = Field(min_length=1, max_length=2000)
 
 

@@ -20,8 +20,6 @@ export async function getPostComments(postId: number): Promise<Comment[]> {
 export async function createComment(payload: {
   post_id: number
   parent_id?: number | null
-  nickname: string
-  email?: string
   content: string
 }): Promise<{ id: number; message: string }> {
   const { data } = await http.post('/comments', payload)

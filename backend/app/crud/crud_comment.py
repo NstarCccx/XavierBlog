@@ -15,12 +15,14 @@ async def create(
     nickname: str,
     email: str,
     content: str,
+    user_id: int | None = None,
     is_author: bool = False,
     status: str = "pending",
 ) -> Comment:
     comment = Comment(
         post_id=post_id,
         parent_id=parent_id,
+        user_id=user_id,
         nickname=nickname,
         email=email,
         content=content,
